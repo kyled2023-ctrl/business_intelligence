@@ -8,3 +8,8 @@ Semester: Fall 2026
 - Data Acquisition & Transformation
 - Data Visualization & Communication
 - Exploratory Data Mining
+
+
+Skills
+R
+Github
