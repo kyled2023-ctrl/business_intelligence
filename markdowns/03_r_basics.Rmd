@@ -15,3 +15,36 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+
+# Cincy Crash Data
+
+```{r cincy_crashes}
+crashes_per_day = 30125 / 365
+crashes_per_day
+
+crashes_by_day = c(2020, 2241, 2327, 2285,
+                   2380, 1866, 1664)
+names(crashes_by_day) = c("Mon", "Tue", "Wed", "Thu",
+                          "Fri", "Sat", "Sun")
+crashes_by_day
+
+crashes_by_day > 2100
+
+sum(crashes_by_day > 2000)
+
+mean(crashes_by_day)
+```
+## Type of `crashes_by_day`
+
+```{r typeof_vec}
+typeof(crashes_by_day)
+
+crashes_by_day_int = c(2020L, 2241L, 2327L, 2285L,
+                   2380L, 1866L, 1664L)
+
+```
+
+
+
+
+
