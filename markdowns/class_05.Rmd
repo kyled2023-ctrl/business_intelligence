@@ -1,0 +1,85 @@
+---
+title: "class_05"
+author: "Kyle Dodson"
+date: "2026-09-09"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    numer_section: true
+    code_download: true
+    code_folding: show
+    theme: simplex
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Game 01: Subsetting Lists
+
+```{r game01}
+campus = jsonlite::fromJSON("https://isa401-find-your-seat.vercel.app/campus.json")
+
+names(campus) # shows the named elements withing a list (or vector) of the cols in each data frame.
+
+# equivelant examples campus[['Farmer']] or campus[[5]]
+
+fsb = campus$Farmer # saving the named farmer list in fsb
+fsb$code
+
+Floors = fsb$floors
+list(Floors$`2`)
+
+names(fsb)
+
+fsb[[8]]
+fsb[[8]][[3]]
+fsb[[8]]$'2'$sections
+
+
+
+sec_floor = fsb[[8]]$'2'
+sec_floor_rooms = sec_floor[[3]]
+sec_floor_rooms[6, 2]
+```
+
+## Reading the excel
+```{r occupations}
+
+occupations = readxl::read_excel(
+  path = "C:/Users/kyled/OneDrive/business_intelligence/data/occupation.xlsx",
+  sheet = 5,
+  skip = 1
+)
+
+occupation = occupation[-c(32,33,34)]
+
+```
+
+```{r}
+json_url = paste0(
+  "https://data.cincinnati-oh.gov/",
+  "resource/rvmt-pkmq.json?$limit=100")
+crashes_json = jsonlite::fromJSON(json_url)
+dplyr::glimpse(
+  crashes_json[, c("crashdate", "dayofweek",
+                   "crashseverity", "age")])
+```
+
+```{r game02}
+logins = readr::read_csv("https://isa401-import-heist.vercel.app/api/stage1")
+
+log = jsonlite::fromJSON("https://isa401-import-heist.vercel.app/api/stage2?key=ACCOUNT")
+
+jsonlite::fromJSON("https://isa401-import-heist.vercel.app/api/finish?code=NUMBER")
+
+list(logins)
+list(logins$failed_attempts)
+summary(logins)
+
+```
+
+
+
+
