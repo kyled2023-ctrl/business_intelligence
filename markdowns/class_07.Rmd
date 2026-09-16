@@ -1,0 +1,17 @@
+---
+title: "class_07"
+author: "Kyle Dodson"
+date: "2026-09-16"
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: true
+    number_sections: true
+    Code_downloading: true
+    code_folding: show
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
