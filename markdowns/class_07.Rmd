@@ -15,3 +15,49 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+#Answering the question
+
+```{r}
+con = DBI::dbConnect(RSQLite::SQLite(), "../data/scout.db")
+postings = DBI::dbReadTable(con, "scout_postings") |> tibble::as_tibble()
+DBI::dbDisconnect(con)
+ 
+jobs = postings |>
+  dplyr::select(company, title, location_state, remote, category, posted_at, last_seen_at) |>
+  dplyr:: filter(remote == 1) |>
+  dplyr::mutate(
+    posted_at = as.Date(posted_at),
+    last_seen_at = as.Date(last_seen_at),
+    days_open = as.numeric(last_seen_at - posted_at)
+    )
+
+```
+
+```{r}
+con = DBI::dbConnect(RSQLite::SQLite(), "../data/scout.db")
+postings = DBI::dbReadTable(con, "scout_postings") |> tibble::as_tibble()
+DBI::dbDisconnect(con)
+ 
+jobs = postings |>
+  dplyr::select(company, title, location_state, remote, category, posted_at, last_seen_at) |>
+  dplyr::mutate(dplyr::across(dplyr::ends_with("_at"), as.Date),
+                days_open = as.numeric(last_seen_at - posted_at))
+
+jobs
+#Q1 -- Which cat is remote friendly?
+#To answer that, the logic would be as follows"
+# - Find the number of jobs per category
+# - Normalize the number of remote jobs by dividing by the total jobs
+
+jobs |>
+  # I want to move from unit of analysis being a job posting to a category
+  dplyr::group_by(category) |>
+  dplyr::summarise(
+    postings = dplyr::m(),
+    remote_share = mean(remote)
+  )
+
+
+
+```
+
