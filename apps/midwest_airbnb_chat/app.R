@@ -31,10 +31,10 @@ ui = page_sidebar(
   
   theme = bs_theme(
     version = 5,
-    primary = "#C3142D",    # Navy blue
+    primary = "#1E3A5F",    # Navy blue
     secondary = "#2A9D8F",  # Teal
     bg = "#F5F7FA",         # Light background
-    base_font = "Apex"
+    base_font = "Arial"
   ),
   
   sidebar = qc$sidebar(width = 350),
