@@ -1,1 +1,5 @@
 /.Rproj.user
+.Renviron
+data/midwest_airbnb.db
+apps/job_scout_chat/data/api_key.txt
+apps/job_scout_chat/data/apikey.txt

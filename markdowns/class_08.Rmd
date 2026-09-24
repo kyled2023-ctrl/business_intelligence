@@ -1,0 +1,112 @@
+---
+title: "class_07"
+author: "Kyle Dodson"
+date: "2026-09-21"
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: true
+    number_sections: true
+    Code_downloading: true
+    code_folding: show
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Cincy Crashes
+
+```{r api_intro}
+httr2::request("https://data.cincinnati-oh.gov/resource/rvmt-pkmq.json") |>
+  httr2::req_url_query("$limit" = 5) |>
+  httr2::req_perform() |>
+  httr2::resp_body_string() |>
+  jsonlite::fromJSON() -> cincy_crashes
+```
+
+# Fred API Key
+
+```{r fred}
+httr2::request("https://api.stlouisfed.org/fred/series/observations") |>
+  httr2::req_url_query(
+    series_id = "IHLIDXUSOH",
+    api_key = Sys.getenv("FRED_API_KEY"),
+    file_type = "json"
+  ) |>
+  httr2::req_perform() |>
+  httr2::resp_body_string() |>
+  jsonlite::fromJSON() -> ohio_jobs
+
+
+jobs_df = ohio_jobs[[13]]
+
+# to get the data from Sept 1, 2026
+
+# (a) to get all the data and then dilter the rows that I want
+##not the most efficient, but correct
+dplyr::glimpse(jobs_df) # realized date is a character
+jobs_df |>
+    # therefore, I overwrote date into a date column
+    dplyr::mutate(
+      date = lubridate::ymd(date)
+    ) |> 
+  # used filter to finad all dates that are >= Sept 1
+  dplyr::filter(date >= '2026-09-01') ->jobs_df_mod
+
+# (b) use the API key since it has observation_start
+
+httr2::request("https://api.stlouisfed.org/fred/series/observations") |>
+  httr2::req_url_query(
+    series_id = "IHLIDXUSOH",
+    api_key = Sys.getenv("FRED_API_KEY"),
+    file_type = "json",
+    observation_start ="2026-09-01"
+  ) |>
+  httr2::req_perform() |>
+  httr2::resp_body_string() |>
+  jsonlite::fromJSON() -> ohio_jobs_sep_2026
+
+ohio_jobs_sep_2026 = ohio_jobs_sep_2026$observations
+
+```
+
+# USA Jobs API
+
+```{r}
+httr2::request("https://data.usajobs.gov/api/search") |>
+  httr2::req_url_query(Keyword = "Data Analyst", ResultsPerPage = 500) |>
+  httr2::req_headers(
+    Host = "data.usajobs.gov",
+    "User-Agent" = "dodsonks@miamioh.edu",
+    "Authorization-Key" = Sys.getenv("USAJOBS_API_KEY")
+  ) |>
+  httr2::req_perform() |>
+  httr2::resp_body_string() |>
+  jsonlite::fromJSON(flatten = TRUE) -> usa_job_list
+
+usajobs_df = usa_job_list$SearchResult$SearchResultItems
+
+jobs_small = usajobs_df |>
+  dplyr::select(
+    title = MatchedObjectDescriptor.PositionTitle,
+    department = MatchedObjectDescriptor.DepartmentName,
+    agency = MatchedObjectDescriptor.OrganizationName,
+    location = MatchedObjectDescriptor.PositionLocationDisplay,
+    closes = MatchedObjectDescriptor.ApplicationCloseDate
+  )
+
+## Answer based on Query
+nrow(jobs_small)
+table(jobs_small$department) |> sort(decreaseing = T) |> head(3)
+jobs_small |> dplyr::count(department) |> dplyr::arrange(dplyr::desc(n)) |> head(3)
+
+
+index_data_analyst = jobs_small$title |>
+  stringr::str_detect(pattern = 'Data Analyst| Data Analytics')
+
+jobs = jobs_small[index_data_analyst, ]
+table(jobs$department)
+
+```
+
