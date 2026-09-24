@@ -15,9 +15,13 @@ The app connects to a SQLite database (`data/scout.db`), hands the `scout_postin
 **Example queries:**
 - "Which Columbus neighborhoods have the highest average prices?"
 ![Columbus prices](screenshots/01_columbus_prices.png)
+![Columbus prices](screenshots/04_columbus_prices.png)
+
 
 - “Compare superhost and other host prices by city.”
 ![Superhost comparison](screenshots/02_superhost_comparison.png)
+![Superhost comparison](screenshots/05_superhost_comparison.png)
+
 
 - “How many listings accommodate 10+ guests?”
 ![Guest capacity](screenshots/03_guest_capacity.png)
@@ -66,6 +70,7 @@ shiny::runApp("apps/midwest_airbnb_chat")
 ```
 
 If your working directory is already `apps/midwest_airbnb_chat`, use `shiny::runApp(".")`.
+
 ---
 
 ---
