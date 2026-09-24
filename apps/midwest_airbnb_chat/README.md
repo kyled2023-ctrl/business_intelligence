@@ -13,29 +13,35 @@ A twelve-line [querychat](https://github.com/posit-dev/querychat) app built in I
 The app connects to a SQLite database (`data/scout.db`), hands the `scout_postings` table to querychat, and lets an LLM translate your question into SQL. Every answer shows the query it ran, so you can check the logic and reuse the SQL yourself.
 
 **Example queries:**
-- "Which Columbus neighborhoods have the highest average prices?" 
+- "Which Columbus neighborhoods have the highest average prices?"
+![Columbus prices](screenshots/01_columbus_prices.png)
+
 - “Compare superhost and other host prices by city.”
+![Superhost comparison](screenshots/02_superhost_comparison.png)
+
 - “How many listings accommodate 10+ guests?”
+![Guest capacity](screenshots/03_guest_capacity.png)
 
 ---
 
-## Dataset Information
+## About
 
-**Dataset:** `scout_postings` table in `data/scout.db` (1,891 rows, 19 columns)
-**Source:** ChatISA Job Scout, which harvested the postings from public job boards between July 29 and August 23, 2026 (the `source` column records the board: `activejobs` or `usajobs`)
-**Data dictionary:** `data/data_desc.md` (started in class; you complete it in Assignment 05)
-**Query rules for the LLM:** `data/extra_instructions.md` (one starter rule; you add more)
+Built by **YOUR NAME** for ISA 401: Business Intelligence and Data Visualization at Miami University.
+Midwest Stay Explorer uses R, Shiny, bslib, querychat, and SQLite to explore 14,887 Airbnb listings. The app has a navy and teal theme, an About section, an interactive listings table, and a visible SQL panel. Charts and summary results appear in the chat.
+The SQL panel describes the current listings table. Aggregate and chart queries are included with their answers in the chat, because those queries do not necessarily update the listings table.
+## Data source
 
-### Key Fields
+The course database comes from [Inside Airbnb](https://insideairbnb.com/get-the-data/).
 
-| Field | Description |
-|-------|-------------|
-| `title` | Job title as it appeared on the board |
-| `company` | Employer name |
-| `location_city` | City of the posting (blank for 61 rows) |
-| `location_state` | Two-letter state code (blank for 30 rows) |
-| `remote` | `1` if the posting is remote, `0` otherwise |
-| `category` | `fulltime`, `federal`, or `internship` |
+| Market | Snapshot date | Listings |
+| --- | --- | ---: |
+| Chicago | 2026-07-20 | 7,439 |
+| Columbus | 2026-07-23 | 2,587 |
+| Twin Cities | 2026-07-21 | 4,861 |
+| Total | | 14,887 |
+
+Each row is one listing. The `listings` table has 29 columns, documented in `data/data_desc.md`. Nightly prices are in USD. The data are historical snapshots, availability is not occupancy, and revenue values are estimates. `host_since` and `instant_bookable` contain no observed values in this database.
+
 
 ---
 
@@ -51,21 +57,33 @@ On Hugging Face Spaces, add it under **Settings > Variables and secrets** as a s
 
 ---
 
-## Running Locally
+## Run locally
 
-**With R (4.6.0, querychat 0.3.0):**
+Open the `business_intelligence` RStudio project and use the packages installed in class. Keep `OPENAI_API_KEY` in the project's ignored `.Renviron`. Restart R after editing that file. Do not publish the key.
+
 ```r
-# from inside apps/job_scout_chat/
-shiny::runApp(".", port = 7860)
+shiny::runApp("apps/midwest_airbnb_chat")
 ```
 
-**With Docker:**
-```bash
-docker build -t job_scout_chat .
-docker run --rm -p 7860:7860 -e OPENAI_API_KEY=$OPENAI_API_KEY job_scout_chat
-```
+If your working directory is already `apps/midwest_airbnb_chat`, use `shiny::runApp(".")`.
+---
 
-Then open http://localhost:7860.
+---
+
+## Deployment
+
+Render web service: Docker; branch `main`; root directory `apps/midwest_airbnb_chat`; instance type Free. Set `OPENAI_API_KEY` in Render's environment settings. The included instructor Dockerfile reads Render's `PORT` and uses the class package snapshot.
+
+---
+
+---
+
+## Credits
+
+- [ISA 401 Job Scout reference app](https://github.com/fmegahed/job_scout_chat)
+- [Inside Airbnb data assumptions and dictionary](https://insideairbnb.com/data-assumptions/)
+- [querychat documentation](https://posit-dev.github.io/querychat/)
+- [bslib theming](https://rstudio.github.io/bslib/articles/theming/index.html)
 
 ---
 
