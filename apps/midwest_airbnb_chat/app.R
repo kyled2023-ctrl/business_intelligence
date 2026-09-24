@@ -20,25 +20,92 @@ qc = querychat::querychat(
 library(shiny)
 library(bslib)
 
+# Make these your own
+app_title = "Midwest Airbnb Chat"
+author_name = "Kyle Dodson"
+
+options(querychat.tool_details = "expanded")
+
 ui = page_sidebar(
-  title   = "Midwest Airbnb Chat",
-  theme   = bs_theme(primary = "#C3142D",
-                     base_font = font_google("Lato")),
+  title = app_title,
+  
+  theme = bs_theme(
+    version = 5,
+    primary = "#1E3A5F",    # Navy blue
+    secondary = "#2A9D8F",  # Teal
+    bg = "#F5F7FA",         # Light background
+    base_font = "Arial"
+  ),
+  
   sidebar = qc$sidebar(width = 350),
-  card(card_header(textOutput("title")),
-       DT::DTOutput("table")),
-  accordion(open = FALSE,
-            accordion_panel("SQL", verbatimTextOutput("sql")),
-            accordion_panel("About", "Job Scout postings; built by <your name>"))
+  
+  card(
+    card_header(textOutput("title")),
+    DT::DTOutput("table")
+  ),
+  
+  accordion(
+    open = "SQL",
+    
+    accordion_panel(
+      "SQL",
+      p("SQL for the currently displayed listings:"),
+      verbatimTextOutput("sql")
+    ),
+    
+    accordion_panel(
+      "About",
+      p(paste("Built by", author_name, "for ISA 401.")),
+      p(
+        "Explore 14,887 Airbnb listings in Chicago,",
+        "Columbus, and the Twin Cities."
+      ),
+      p(
+        "Data source: ",
+        tags$a(
+          "Inside Airbnb",
+          href = "https://insideairbnb.com/get-the-data/",
+          target = "_blank"
+        )
+      ),
+      tags$ul(
+        tags$li("Chicago: July 20, 2026"),
+        tags$li("Columbus: July 23, 2026"),
+        tags$li("Twin Cities: July 21, 2026")
+      )
+    )
+  )
 )
 
 server = function(input, output, session) {
   vals = qc$server()
-  output$title = renderText(vals$title() %||% "All postings")
-  output$table = DT::renderDT(vals$df(),
-                              options = list(pageLength = 10))
-  output$sql   = renderText(vals$sql() %||%
-                              "SELECT * FROM scout_postings")
+  
+  output$title = renderText({
+    current_title = vals$title()
+    
+    if (is.null(current_title) || !nzchar(current_title)) {
+      "All Airbnb listings"
+    } else {
+      current_title
+    }
+  })
+  
+  output$table = DT::renderDT(
+    vals$df(),
+    options = list(pageLength = 10, scrollX = TRUE),
+    rownames = FALSE,
+    server = TRUE
+  )
+  
+  output$sql = renderText({
+    current_sql = vals$sql()
+    
+    if (is.null(current_sql) || !nzchar(current_sql)) {
+      "SELECT * FROM listings"
+    } else {
+      current_sql
+    }
+  })
 }
 
 shinyApp(ui, server)
