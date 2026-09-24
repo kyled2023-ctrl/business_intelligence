@@ -31,9 +31,10 @@ ui = page_sidebar(
   
   theme = bs_theme(
     version = 5,
-    primary = "#1E3A5F",    # Navy blue
-    secondary = "#2A9D8F",  # Teal
-    bg = "#F5F7FA",         # Light background
+    primary = "#1E3A5F",
+    secondary = "#2A9D8F",
+    bg = "#F5F7FA",
+    fg = "#172A3A",
     base_font = "Arial"
   ),
   
