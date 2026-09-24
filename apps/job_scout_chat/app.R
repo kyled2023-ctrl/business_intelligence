@@ -18,3 +18,4 @@ qc = querychat(
 qc$app_obj()
 
 install.packages("querychat", dependencies = T)
+
