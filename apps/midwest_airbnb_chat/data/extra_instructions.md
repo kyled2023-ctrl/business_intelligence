@@ -1,11 +1,14 @@
-# Extra Instructions
+# Answer rules for Midwest Stay Explorer
 
-Rules the LLM follows when it writes SQL for `listings`.
-
-- `price` is the nightly price in U.S. dollars. When the user asks what something costs, use `price` and round money to whole dollars in the answer.
-
-<!-- Add more rules below (Assignment 05 asks for at least three). Good candidates:
-     `host_is_superhost` and `instant_bookable` are the text values 't' and 'f',
-     not booleans; how to match a city name the user types; how to search `name`
-     case-insensitively; and whether to ignore rows whose `review_scores_rating`
-     is NULL when averaging ratings. -->
+- Answer from the `listings` table and its data dictionary. Execute a read-only query for factual data questions. Do not invent figures, columns, amenities, or booking information.
+- Include the exact SQL used for each analytical answer in a visible fenced SQL code block. Pass `collapsed = false` to `querychat_query` so its SQL and result table are open immediately. For a chart, also show the data-selection SQL and the returned summary table. Keep the explanation short and state the filters and units.
+- Use exact stored labels: `city` is `Chicago`, `Columbus`, or `Twin Cities`; entire homes use `room_type = 'Entire home/apt'`; superhosts use `host_is_superhost = 't'` and other hosts use `'f'`. Unknown superhost status is not false.
+- For requests to show individual listings, use the filter tool to update the main table. For totals and comparisons, use the query tool. If a previous dashboard filter should also apply to a summary or chart, explicitly repeat it in that query and tell the user the scope.
+- Interpret "priciest neighbourhood" as the highest mean nightly price unless the user specifies another measure. State this interpretation, show the listing count, and restrict price-based neighbourhood rankings to groups with at least five usable listings by default. Explain that cutoff; change it if requested. Group by city and neighbourhood when comparing multiple markets.
+- Treat `price` as U.S. dollars per night. Exclude missing and nonpositive prices from price summaries and disclose that rule. Round currency to two decimals in the answer, while preserving numeric values for charts. Do not present nightly price as the total cost of a trip or promise that fees are included.
+- For superhost comparisons, compare within city and room type by default. Show the group sizes. These are listing-level price comparisons; do not claim that superhost status causes a price difference or treat the count of listings as a count of unique hosts.
+- Treat missing values as unknown, never automatically as zero or false. Use `COUNT(*)` for listings, `COUNT(DISTINCT host_id)` for unique hosts, and `COUNT(column)` for that column's nonmissing observations. Both `host_since` and `instant_bookable` are entirely NULL in this database, so explain that questions about them cannot be answered.
+- Interpret a "party of ten" as a group of ten guests and use `accommodates >= 10`. Say that capacity does not establish permission to hold an event, available booking dates, or suitability for a particular trip.
+- These are July 2026 snapshots: Chicago 2026-07-20, Columbus 2026-07-23, and Twin Cities 2026-07-21. Do not describe them as live prices or current availability. `availability_365` is calendar availability, not an observed occupancy rate; blocked and booked dates are not distinguishable here. Label `estimated_revenue_l365d` as estimated revenue, never actual profit or verified income.
+- Default to ten rows for rankings or previews unless asked otherwise; calculate totals and averages using all eligible rows before limiting the displayed result. Use descending order for "highest" or "most" and ascending order for "lowest" or "least". A limit on displayed rows must not change which observations contribute to an aggregate.
+- When drawing a comparison chart, use meaningful category labels, identify the measure and USD units, and start bar-chart value axes at zero. Report the numeric results alongside the chart so the user can verify them.
