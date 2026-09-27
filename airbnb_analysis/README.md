@@ -1,0 +1,5 @@
+- Hosts with at least 10 listings hold 37.1% of Columbus listings, 31.9% of Chicago listings, and 17.2% of Twin Cities listings, suggesting a ten-listing cap would affect Columbus most in proportional terms.
+- North Linden has the lowest qualifying Columbus median price per person at $32.55 across 20 entire homes, making it a useful starting point for families looking for value.
+- Columbus has the lowest share of mostly-taken entire homes for October 2026 at 19.0%, giving travelers a comparison of calendar availability while recognizing that unavailable nights may be booked or blocked by hosts.
+- Twin Cities listings received 7,399 reviews in August 2025, which is 2.37 times February 2026's total, suggesting stronger summer demand rather than proving a specific number of bookings.
+- There are 456 listings with no availability rows, including 267 in Chicago, the largest loss of any city, so calendar comparisons leave out part of each market.
