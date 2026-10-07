@@ -1,0 +1,94 @@
+---
+title: "Assignment 07: Web Scraping the FSB Directory"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    number_sections: true
+    code_download: true
+    code_folding: show
+    df_print: kable
+    self_contained: true
+    mathjax: null
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+This code uses the function and `purrr` approach from Class 11 to collect
+the department, name, position, and website for faculty and staff in all
+seven departments.
+
+## Scrape the directory
+
+```{r purrr}
+# Department names as they appear in the directory URLs.
+dept_names = c(
+  'Accountancy', 'Economics', 'Entrepreneurship', 'Finance',
+  'Information Systems -- Analytics', 'Marketing', 'Management'
+)
+
+# This function takes a department as input and returns a data frame.
+scrape_fsb_directory = function(dept){
+  directory_url = paste0(
+    'https://miamioh.edu/fsb/directory/?up=/query/all/all/',
+    utils::URLencode(dept), '/all'
+  )
+
+  # Pause between requests, then read the webpage.
+  Sys.sleep(1)
+  webpage = rvest::read_html(directory_url)
+
+  # Keep each person's information together in the same table cell.
+  webpage |> rvest::html_elements("#sidebar-main table td:nth-child(3)") -> people
+  people |> rvest::html_element("strong a") -> name_links
+
+  # html_text() keeps hidden HTML comments out of the names.
+  name_links |> rvest::html_text(trim = TRUE) |> stringr::str_squish() -> faculty_names
+  people |> rvest::html_element("i") |> rvest::html_text2() |>
+    stringr::str_squish() -> positions
+  name_links |> rvest::html_attr("href") -> websites
+
+  df = data.frame(
+    department = gsub(" -- ", " & ", dept, fixed = TRUE),
+    name = faculty_names,
+    position = positions,
+    website = websites
+  )
+  return(df)
+}
+
+# .x is the vector to iterate over, and .f is the function to use.
+fsb_directory = purrr::map_df(.x = dept_names, .f = scrape_fsb_directory)
+```
+
+## First few observations
+
+```{r first-observations}
+head(fsb_directory)
+```
+
+## Check the results
+
+The department counts show that all seven departments are included.
+
+```{r department-counts}
+dplyr::count(fsb_directory, department, name = "people")
+```
+
+The checks below confirm that all seven expected departments are present
+and that every row has a department, name, position, and website. A zero
+in the last output means that column has no missing or blank values.
+
+```{r check-completeness}
+setequal(
+  unique(fsb_directory$department),
+  gsub(" -- ", " & ", dept_names, fixed = TRUE)
+)
+
+colSums(is.na(fsb_directory) | fsb_directory == "")
+```
+
+Source: [Miami University FSB Directory](https://miamioh.edu/fsb/directory/).
